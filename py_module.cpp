@@ -21,10 +21,7 @@ struct MkState {
     std::string value;
 };
 
-#define COOKIE 0xdeadbeefabad1deaUL
-
 struct MkCookie {
-    unsigned long long cookie = COOKIE;
     std::shared_ptr<MkState> s{new MkState};
 };
 
@@ -48,11 +45,6 @@ static PyObject *meth_destroy(PyObject *, PyObject *args) {
         return nullptr;
     }
     MkCookie *cookie = (MkCookie *)pointer;
-    if (cookie->cookie != COOKIE) {
-        PyErr_SetString(PyExc_RuntimeError, "invalid object cookie");
-        return nullptr;
-    }
-    cookie->cookie = 0UL; // Weak prevention of double free
     delete cookie;
     Py_INCREF(Py_None);
     return Py_None;
@@ -66,10 +58,6 @@ static PyObject *meth_setopt(PyObject *, PyObject *args) {
         return nullptr;
     }
     MkCookie *cookie = (MkCookie *)pointer;
-    if (cookie->cookie != COOKIE) {
-        PyErr_SetString(PyExc_RuntimeError, "invalid object cookie");
-        return nullptr;
-    }
     cookie->s->key = key;
     cookie->s->value = value;
     Py_INCREF(Py_None);
@@ -87,10 +75,6 @@ static PyObject *meth_run_async(PyObject *, PyObject *args) {
         return nullptr;
     }
     MkCookie *cookie = (MkCookie *)pointer;
-    if (cookie->cookie != COOKIE) {
-        PyErr_SetString(PyExc_RuntimeError, "invalid object cookie");
-        return nullptr;
-    }
     auto st = cookie->s;
     if (st->callback != nullptr) {
         PyErr_SetString(PyExc_RuntimeError, "already running");
