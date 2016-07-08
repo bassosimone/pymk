@@ -8,7 +8,7 @@ Vagrant.configure(2) do |config|
     jessie64.vm.provision "shell", inline: <<-SHELL
       sudo apt-get update
       sudo apt-get dist-upgrade -y
-      sudo apt-get install -y python3-dev python-dev
+      sudo apt-get install -y python3-dev python-dev build-essential
     SHELL
   end
 end
