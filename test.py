@@ -6,12 +6,13 @@ from __future__ import print_function
 import _mk
 import time
 
-handle = _mk.create()
-_mk.setopt(handle, "foo", "bar")
+handle = _mk.create("ndt")
+_mk.set_options(handle, "save_real_probe_ip", "true")
+_mk.increase_verbosity(handle)
 again = [True]
 
-def on_complete(err):
-    print("result:", err)
+def on_complete():
+    print("test done")
     again[0] = False
 
 _mk.run_async(handle, on_complete)

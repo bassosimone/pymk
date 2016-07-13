@@ -5,35 +5,29 @@
 // Related, interesting read: <https://gist.github.com/liuyu81/3473376>.
 
 #include <Python.h> // Should be first header
-#include <chrono>
-#include <functional>
-#include <iostream>
-#include <memory>
-#include <string>
-#include <thread>
+#include <measurement_kit/ndt.hpp>
 
 extern "C" {
 
-struct MkState {
-    PyObject *callback = nullptr;
-    std::string key;
-    std::thread thread;
-    std::string value;
-};
+using namespace mk;
 
 struct MkCookie {
-    std::shared_ptr<MkState> s{new MkState};
+    Var<NetTest> net_test;
 };
 
 static PyObject *meth_create(PyObject *, PyObject *args) {
-    if (!PyArg_ParseTuple(args, "")) {
+    const char *name = nullptr;
+    if (!PyArg_ParseTuple(args, "s", &name)) {
         return nullptr;
     }
-    MkCookie *cookie = nullptr;
-    try {
-        cookie = new MkCookie;
-    } catch (const std::bad_alloc &) {
-        PyErr_SetString(PyExc_MemoryError, "cannot allocate MkCookie");
+    MkCookie *cookie = new MkCookie;
+    if (strcmp(name, "ndt") == 0) {
+        cookie->net_test.reset(new ndt::NdtTest);
+    } else {
+        /* nothing */ ;
+    }
+    if (!cookie->net_test) {
+        PyErr_SetString(PyExc_RuntimeError, "invalid test name");
         return nullptr;
     }
     return Py_BuildValue("L", cookie);
@@ -50,7 +44,18 @@ static PyObject *meth_destroy(PyObject *, PyObject *args) {
     return Py_None;
 }
 
-static PyObject *meth_setopt(PyObject *, PyObject *args) {
+static PyObject *meth_increase_verbosity(PyObject *, PyObject *args) {
+    long long pointer = 0LL;
+    if (!PyArg_ParseTuple(args, "L", &pointer)) {
+        return nullptr;
+    }
+    MkCookie *cookie = (MkCookie *) pointer;
+    cookie->net_test->increase_verbosity();
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject *meth_set_options(PyObject *, PyObject *args) {
     const char *key = nullptr;
     long long pointer = 0LL;
     const char *value = nullptr;
@@ -58,8 +63,7 @@ static PyObject *meth_setopt(PyObject *, PyObject *args) {
         return nullptr;
     }
     MkCookie *cookie = (MkCookie *)pointer;
-    cookie->s->key = key;
-    cookie->s->value = value;
+    cookie->net_test->set_options(key, value);
     Py_INCREF(Py_None);
     return Py_None;
 }
@@ -75,38 +79,22 @@ static PyObject *meth_run_async(PyObject *, PyObject *args) {
         return nullptr;
     }
     MkCookie *cookie = (MkCookie *)pointer;
-    auto st = cookie->s;
-    if (st->callback != nullptr) {
-        PyErr_SetString(PyExc_RuntimeError, "already running");
-        return nullptr;
-    }
-    st->callback = callback;
     Py_INCREF(callback);
     Py_BEGIN_ALLOW_THREADS // Releases the GIL
 
-    st->thread = std::thread([st]() {
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+    cookie->net_test->run([callback]() {
         PyGILState_STATE state = PyGILState_Ensure(); // Acquires the GIL
 
-        PyObject *args = Py_BuildValue("(i)", 0);
-        if (args != nullptr) {
-            PyObject *result = PyObject_CallObject(st->callback, args);
-            if (result != nullptr) {
-                Py_DECREF(result);
-            } else {
-                PyErr_Print();
-            }
-            Py_DECREF(args);
+        PyObject *result = PyObject_CallObject(callback, nullptr);
+        if (result != nullptr) {
+            Py_DECREF(result);
         } else {
             PyErr_Print();
         }
-
-        Py_DECREF(st->callback);
-        st->callback = nullptr;
+        Py_DECREF(callback);
 
         PyGILState_Release(state); // Releases the GIL
     });
-    st->thread.detach();
 
     Py_END_ALLOW_THREADS // Acquires the GIL
     Py_INCREF(Py_None);
@@ -116,7 +104,8 @@ static PyObject *meth_run_async(PyObject *, PyObject *args) {
 static PyMethodDef Methods[] = {
     {"create", meth_create, METH_VARARGS, ""},
     {"destroy", meth_destroy, METH_VARARGS, ""},
-    {"setopt", meth_setopt, METH_VARARGS, ""},
+    {"increase_verbosity", meth_increase_verbosity, METH_VARARGS, ""},
+    {"set_options", meth_set_options, METH_VARARGS, ""},
     {"run_async", meth_run_async, METH_VARARGS, ""},
     {nullptr, nullptr, 0, nullptr},
 };
