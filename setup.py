@@ -2,7 +2,7 @@
 
 from distutils.core import setup, Extension
 
-module1 = Extension('_mk',
+module1 = Extension('_measurement_kit',
                     language = "c++",
                     extra_compile_args = ['-std=c++11'],
                     libraries = ['measurement_kit'],

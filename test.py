@@ -3,7 +3,7 @@
 # information on the copying conditions.
 
 from __future__ import print_function
-import _mk
+import _measurement_kit as _mk
 import time
 
 handle = _mk.create("ndt")
