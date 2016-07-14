@@ -6,6 +6,7 @@
 
 #include <Python.h> // Should be first header
 #include <measurement_kit/ndt.hpp>
+#include <measurement_kit/ooni.hpp>
 
 extern "C" {
 
@@ -23,6 +24,12 @@ static PyObject *meth_create(PyObject *, PyObject *args) {
     MkCookie *cookie = new MkCookie;
     if (strcmp(name, "ndt") == 0) {
         cookie->net_test.reset(new ndt::NdtTest);
+    } else if (strcmp(name, "dns_injection") == 0) {
+        cookie->net_test.reset(new ooni::DnsInjection);
+    } else if (strcmp(name, "http_invalid_request_line") == 0) {
+        cookie->net_test.reset(new ooni::HttpInvalidRequestLine);
+    } else if (strcmp(name, "tcp_connect") == 0) {
+        cookie->net_test.reset(new ooni::TcpConnect);
     } else {
         /* nothing */ ;
     }
@@ -44,6 +51,18 @@ static PyObject *meth_destroy(PyObject *, PyObject *args) {
     return Py_None;
 }
 
+static PyObject *meth_set_verbosity(PyObject *, PyObject *args) {
+    int verbosity = 0;
+    long long pointer = 0LL;
+    if (!PyArg_ParseTuple(args, "Li", &pointer, &verbosity)) {
+        return nullptr;
+    }
+    MkCookie *cookie = (MkCookie *) pointer;
+    cookie->net_test->set_verbosity(verbosity);
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 static PyObject *meth_increase_verbosity(PyObject *, PyObject *args) {
     long long pointer = 0LL;
     if (!PyArg_ParseTuple(args, "L", &pointer)) {
@@ -51,6 +70,30 @@ static PyObject *meth_increase_verbosity(PyObject *, PyObject *args) {
     }
     MkCookie *cookie = (MkCookie *) pointer;
     cookie->net_test->increase_verbosity();
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject *meth_set_input_filepath(PyObject *, PyObject *args) {
+    const char *path = nullptr;
+    long long pointer = 0LL;
+    if (!PyArg_ParseTuple(args, "Ls", &pointer, &path)) {
+        return nullptr;
+    }
+    MkCookie *cookie = (MkCookie *)pointer;
+    cookie->net_test->set_input_filepath(path);
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject *meth_set_output_filepath(PyObject *, PyObject *args) {
+    const char *path = nullptr;
+    long long pointer = 0LL;
+    if (!PyArg_ParseTuple(args, "Ls", &pointer, &path)) {
+        return nullptr;
+    }
+    MkCookie *cookie = (MkCookie *)pointer;
+    cookie->net_test->set_output_filepath(path);
     Py_INCREF(Py_None);
     return Py_None;
 }
@@ -104,7 +147,10 @@ static PyObject *meth_run_async(PyObject *, PyObject *args) {
 static PyMethodDef Methods[] = {
     {"create", meth_create, METH_VARARGS, ""},
     {"destroy", meth_destroy, METH_VARARGS, ""},
+    {"increase_set_verbosity", meth_set_verbosity, METH_VARARGS, ""},
     {"increase_verbosity", meth_increase_verbosity, METH_VARARGS, ""},
+    {"set_input_filepath", meth_set_input_filepath, METH_VARARGS, ""},
+    {"set_output_filepath", meth_set_output_filepath, METH_VARARGS, ""},
     {"set_options", meth_set_options, METH_VARARGS, ""},
     {"run_async", meth_run_async, METH_VARARGS, ""},
     {nullptr, nullptr, 0, nullptr},
@@ -138,4 +184,4 @@ MOD_INIT(_mk) {
     return MOD_SUCCESS_VAL(module);
 }
 
-}
+} // extern "C"
