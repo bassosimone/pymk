@@ -7,14 +7,18 @@ import _measurement_kit as _mk
 import time
 
 handle = _mk.create("ndt")
-_mk.set_options(handle, "save_real_probe_ip", "true")
-_mk.increase_verbosity(handle)
+_mk.set_options(handle, "save_real_probe_ip", "1")
+_mk.set_verbosity(handle, 1)
 again = [True]
 
 def on_complete():
     print("test done")
     again[0] = False
 
+def on_log(severity, line):
+    print("mk: <{}> {}".format(severity, line))
+
+_mk.on_log(handle, on_log)
 _mk.run_async(handle, on_complete)
 _mk.destroy(handle)
 while again[0]:
