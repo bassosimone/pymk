@@ -64,6 +64,14 @@ class TestIntegrationSync(unittest.TestCase):
             .set_input_filepath(b"fixtures/hosts.txt")                         \
             .run()
 
+    def test_web_connectivity(self):
+        """ Runs web-connectivity test """
+        measurement_kit.WebConnectivity()                                      \
+            .set_verbosity(measurement_kit.MK_LOG_DEBUG)                       \
+            .set_options(b"nameserver", b"8.8.8.8:53")                         \
+            .set_input_filepath(b"fixtures/urls.txt")                          \
+            .run()
+
 class TestIntegrationAsync(unittest.TestCase):
     """ Integration test using async wrappers """
 
@@ -128,6 +136,22 @@ class TestIntegrationAsync(unittest.TestCase):
         while not done[0]:
             time.sleep(1)
 
+    def test_web_connectivity(self):
+        """ Runs web-connectivity test """
+
+        done = [False]
+        def complete():
+            done[0] = True
+
+        measurement_kit.WebConnectivity()                                      \
+            .set_verbosity(measurement_kit.MK_LOG_DEBUG)                       \
+            .set_options(b"nameserver", b"8.8.8.8:53")                         \
+            .set_input_filepath(b"fixtures/urls.txt")                          \
+            .run_async(complete)
+
+        while not done[0]:
+            time.sleep(1)
+
 class TestIntegrationDeferred(unittest.TestCase):
     """ Integration test using deferred wrappers """
 
@@ -168,6 +192,17 @@ class TestIntegrationDeferred(unittest.TestCase):
             .set_verbosity(measurement_kit.MK_LOG_DEBUG)                       \
             .set_options(b"port", b"80")                                       \
             .set_input_filepath(b"fixtures/hosts.txt")                         \
+            .run_deferred()
+        d.addCallback(lambda *args: reactor.callFromThread(reactor.stop))
+        reactor.run()
+
+    def test_web_connectivity(self):
+        """ Runs web-connectivity test """
+        from twisted.internet import reactor
+        d = measurement_kit.WebConnectivity()                                  \
+            .set_verbosity(measurement_kit.MK_LOG_DEBUG)                       \
+            .set_options(b"nameserver", b"8.8.8.8:53")                         \
+            .set_input_filepath(b"fixtures/urls.txt")                          \
             .run_deferred()
         d.addCallback(lambda *args: reactor.callFromThread(reactor.stop))
         reactor.run()

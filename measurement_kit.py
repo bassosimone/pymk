@@ -86,3 +86,8 @@ class NdtTest(_BaseTest):
 class TcpConnect(_BaseTest):
     def __init__(self):
         super(self.__class__, self).__init__(b"tcp_connect")
+
+
+class WebConnectivity(_BaseTest):
+    def __init__(self):
+        super(self.__class__, self).__init__(b"web_connectivity")

@@ -42,6 +42,8 @@ static PyObject *meth_create(PyObject *, PyObject *args) {
         cookie->net_test.reset(new ooni::HttpInvalidRequestLine);
     } else if (strcmp(name, "tcp_connect") == 0) {
         cookie->net_test.reset(new ooni::TcpConnect);
+    } else if (strcmp(name, "web_connectivity") == 0) {
+        cookie->net_test.reset(new ooni::WebConnectivity);
     } else {
         /* nothing */ ;
     }
