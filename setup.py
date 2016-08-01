@@ -18,5 +18,5 @@ setup(name = 'measurement_kit',
 Portable C++11 network measurement library (Python bindings)
 ''',
       py_modules = ["measurement_kit"],
-      ext_modules = [extension]
+      ext_modules = [extension],
       )

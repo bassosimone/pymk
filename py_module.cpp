@@ -143,6 +143,21 @@ static PyObject *meth_set_options(PyObject *, PyObject *args) {
     return Py_None;
 }
 
+static PyObject *meth_run(PyObject *, PyObject *args) {
+    long long pointer = 0LL;
+    if (!PyArg_ParseTuple(args, "L", &pointer)) {
+        return nullptr;
+    }
+    MkCookie *cookie = (MkCookie *)pointer;
+    Py_BEGIN_ALLOW_THREADS // Releases the GIL
+
+    cookie->net_test->run();
+
+    Py_END_ALLOW_THREADS // Acquires the GIL
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 static PyObject *meth_run_async(PyObject *, PyObject *args) {
     long long pointer = 0LL;
     PyObject *callback = nullptr;
@@ -185,6 +200,7 @@ static PyMethodDef Methods[] = {
     {"set_input_filepath", meth_set_input_filepath, METH_VARARGS, ""},
     {"set_output_filepath", meth_set_output_filepath, METH_VARARGS, ""},
     {"set_options", meth_set_options, METH_VARARGS, ""},
+    {"run", meth_run, METH_VARARGS, ""},
     {"run_async", meth_run_async, METH_VARARGS, ""},
     {nullptr, nullptr, 0, nullptr},
 };

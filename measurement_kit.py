@@ -49,14 +49,17 @@ class _BaseTest(object):
         _mk.set_options(self._handle, key, value)
         return self
 
+    def run(self):
+        _mk.run(self._handle)
+
     def run_async(self, callback):
         _mk.run_async(self._handle, callback)
 
     def run_deferred(self):
-        from twisted import defer
+        from twisted.internet import defer
         d = defer.Deferred()
         def callback():
-            d.callback()
+            d.callback(None)
         _mk.run_async(self._handle, callback)
         return d
 
@@ -77,5 +80,5 @@ class NdtTest(_BaseTest):
 
 
 class TcpConnect(_BaseTest):
-    def __init__(self, easy):
-        super(self.__class__, self).__init__(b"ooni/tcp_connect")
+    def __init__(self):
+        super(self.__class__, self).__init__(b"tcp_connect")
