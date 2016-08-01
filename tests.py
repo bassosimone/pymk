@@ -128,5 +128,49 @@ class TestIntegrationAsync(unittest.TestCase):
         while not done[0]:
             time.sleep(1)
 
+class TestIntegrationDeferred(unittest.TestCase):
+    """ Integration test using deferred wrappers """
+
+    def test_dns_injection(self):
+        """ Runs dns-injection test """
+        from twisted.internet import reactor
+        d = measurement_kit.DnsInjection()                                     \
+            .set_verbosity(measurement_kit.MK_LOG_DEBUG)                       \
+            .set_options(b"backend", b"8.8.8.1:53")                            \
+            .set_input_filepath(b"fixtures/hosts.txt")                         \
+            .run_deferred()
+        d.addCallback(lambda *args: reactor.callFromThread(reactor.stop))
+        reactor.run()
+
+    def test_http_invalid_request_line(self):
+        """ Runs http-invalid-request-line test """
+        from twisted.internet import reactor
+        d = measurement_kit.HttpInvalidRequestLine()                           \
+            .set_verbosity(measurement_kit.MK_LOG_DEBUG)                       \
+            .set_options(b"backend", b"http://213.138.109.232/")               \
+            .run_deferred()
+        d.addCallback(lambda *args: reactor.callFromThread(reactor.stop))
+        reactor.run()
+
+    def test_ndt(self):
+        """ Runs ndt test """
+        from twisted.internet import reactor
+        d = measurement_kit.NdtTest()                                          \
+            .set_verbosity(measurement_kit.MK_LOG_DEBUG)                       \
+            .run_deferred()
+        d.addCallback(lambda *args: reactor.callFromThread(reactor.stop))
+        reactor.run()
+
+    def test_tcp_connect(self):
+        """ Runs tcp-connect test """
+        from twisted.internet import reactor
+        d = measurement_kit.TcpConnect()                                       \
+            .set_verbosity(measurement_kit.MK_LOG_DEBUG)                       \
+            .set_options(b"port", b"80")                                       \
+            .set_input_filepath(b"fixtures/hosts.txt")                         \
+            .run_deferred()
+        d.addCallback(lambda *args: reactor.callFromThread(reactor.stop))
+        reactor.run()
+
 if __name__ == "__main__":
     unittest.main()
