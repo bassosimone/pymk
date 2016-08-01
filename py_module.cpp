@@ -16,6 +16,18 @@ struct MkCookie {
     Var<NetTest> net_test;
 };
 
+static PyObject *meth_library_version(PyObject *, PyObject *args) {
+    if (!PyArg_ParseTuple(args, "")) {
+        return nullptr;
+    }
+    std::string version = library_version();
+    if (version != MEASUREMENT_KIT_VERSION) {
+        PyErr_SetString(PyExc_RuntimeError, "MK version mismatch");
+        return nullptr;
+    }
+    return Py_BuildValue("s", version.c_str());
+}
+
 static PyObject *meth_create(PyObject *, PyObject *args) {
     const char *name = nullptr;
     if (!PyArg_ParseTuple(args, "s", &name)) {
@@ -192,6 +204,7 @@ static PyObject *meth_run_async(PyObject *, PyObject *args) {
 }
 
 static PyMethodDef Methods[] = {
+    {"library_version", meth_library_version, METH_VARARGS, ""},
     {"create", meth_create, METH_VARARGS, ""},
     {"destroy", meth_destroy, METH_VARARGS, ""},
     {"set_verbosity", meth_set_verbosity, METH_VARARGS, ""},

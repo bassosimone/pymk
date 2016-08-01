@@ -6,6 +6,12 @@ from __future__ import print_function
 
 import _measurement_kit as _mk
 
+# Note: the following call would raise an error if there is a mismatch between
+# the version of MK we compiled with and the one we link with
+MK_LIBRARY_VERSION = _mk.library_version()
+print("MeasurementKit version:", MK_LIBRARY_VERSION)
+
+
 # Note: keep this in sync with <measurement_kit/logger.hpp>
 MK_LOG_WARNING = 0
 MK_LOG_INFO = 1
@@ -13,8 +19,6 @@ MK_LOG_DEBUG = 2
 MK_LOG_DEBUG2 = 3
 MK_LOG_VERBOSITY_MASK = 31
 MK_LOG_JSON = 32
-
-# TODO: make sure that the version matches
 
 
 class _BaseTest(object):
