@@ -64,5 +64,69 @@ class TestIntegrationSync(unittest.TestCase):
             .set_input_filepath(b"fixtures/hosts.txt")                         \
             .run()
 
+class TestIntegrationAsync(unittest.TestCase):
+    """ Integration test using async wrappers """
+
+    def test_dns_injection(self):
+        """ Runs dns-injection test """
+
+        done = [False]
+        def complete():
+            done[0] = True
+
+        measurement_kit.DnsInjection()                                         \
+            .set_verbosity(measurement_kit.MK_LOG_DEBUG)                       \
+            .set_options(b"backend", b"8.8.8.1:53")                            \
+            .set_input_filepath(b"fixtures/hosts.txt")                         \
+            .run_async(complete)
+
+        while not done[0]:
+            time.sleep(1)
+
+    def test_http_invalid_request_line(self):
+        """ Runs http-invalid-request-line test """
+
+        done = [False]
+        def complete():
+            done[0] = True
+
+        measurement_kit.HttpInvalidRequestLine()                               \
+            .set_verbosity(measurement_kit.MK_LOG_DEBUG)                       \
+            .set_options(b"backend", b"http://213.138.109.232/")               \
+            .run_async(complete)
+
+        while not done[0]:
+            time.sleep(1)
+
+    def test_ndt(self):
+        """ Runs ndt test """
+
+        done = [False]
+        def complete():
+            done[0] = True
+
+        measurement_kit.NdtTest()                                              \
+            .set_verbosity(measurement_kit.MK_LOG_DEBUG)                       \
+            .run_async(complete)
+
+        while not done[0]:
+            time.sleep(1)
+
+    def test_tcp_connect(self):
+        """ Runs tcp-connect test """
+
+        done = [False]
+        def complete():
+            done[0] = True
+
+        measurement_kit.TcpConnect()                                           \
+            .set_verbosity(measurement_kit.MK_LOG_DEBUG)                       \
+            .set_options(b"port", b"80")                                       \
+            .set_input_filepath(b"fixtures/hosts.txt")                         \
+            .run_async(complete)
+
+        while not done[0]:
+            time.sleep(1)
+
 if __name__ == "__main__":
     unittest.main()
