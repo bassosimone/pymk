@@ -52,6 +52,7 @@ static PyObject *meth_create(PyObject *, PyObject *args) {
         /* nothing */ ;
     }
     if (!cookie->net_test) {
+        delete cookie;
         PyErr_SetString(PyExc_RuntimeError, "invalid test name");
         return nullptr;
     }
