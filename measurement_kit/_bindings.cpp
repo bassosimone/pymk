@@ -5,6 +5,7 @@
 // Related, interesting read: <https://gist.github.com/liuyu81/3473376>.
 
 #include <Python.h> // Should be first header
+
 #include <measurement_kit/ndt.hpp>
 #include <measurement_kit/ooni.hpp>
 
@@ -12,6 +13,9 @@ extern "C" {
 
 using namespace mk;
 
+// Holds the Var<NetTest> actually used for running the test. Note that the
+// code below SHOULD NOT assume that cookie is alive after the test has been
+// started, i.e. no callback should ever refer to it.
 struct MkCookie {
     Var<NetTest> net_test;
 };
@@ -100,6 +104,8 @@ static PyObject *meth_on_log(PyObject *, PyObject *args) {
     // keep it safe and only release the reference when the logger dies
     Py_INCREF(callback);
     cookie->net_test->logger->on_eof([callback]() {
+        // Note: this is called by the destructor of the logger when the
+        // owning NetTest is also about to be destroyed
         Py_DECREF(callback);
     });
 
@@ -134,7 +140,16 @@ static PyObject *meth_on_entry(PyObject *, PyObject *args) {
     }
     MkCookie *cookie = (MkCookie *)pointer;
 
-    Py_INCREF(callback); /* XXX */
+    // Reference the callback to keep it safe and remove the reference when
+    // we enter into the `end` state. It should not happen that `on_entry` is
+    // called again, but for robustness, better to clear it.
+    Py_INCREF(callback);
+    Var<NetTest> net_test = cookie->net_test;
+    cookie->net_test->on_end([callback, net_test]() {
+        net_test->on_entry(nullptr);
+        Py_DECREF(callback);
+    });
+
     cookie->net_test->on_entry([callback](std::string entry) {
         PyGILState_STATE state = PyGILState_Ensure(); // Acquires the GIL
 
