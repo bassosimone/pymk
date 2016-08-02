@@ -270,10 +270,10 @@ static PyMethodDef Methods[] = {
           ob = Py_InitModule3(name, methods, doc);
 #endif
 
-MOD_INIT(_measurement_kit) {
+MOD_INIT(_bindings) {
     PyObject *module = nullptr;
 
-    MOD_DEF(module, "_measurement_kit", "MeasurementKit bindings", Methods);
+    MOD_DEF(module, "_bindings", "MeasurementKit bindings", Methods);
     if (module == nullptr) {
         return MOD_ERROR_VAL;
     }
