@@ -120,6 +120,38 @@ static PyObject *meth_on_log(PyObject *, PyObject *args) {
     return Py_None;
 }
 
+static PyObject *meth_on_entry(PyObject *, PyObject *args) {
+    PyObject *callback = nullptr;
+    long long pointer = 0LL;
+    if (!PyArg_ParseTuple(args, "LO:on_entry", &pointer, &callback)) {
+        return nullptr;
+    }
+    MkCookie *cookie = (MkCookie *)pointer;
+
+    Py_INCREF(callback); /* XXX */
+    cookie->net_test->on_entry([callback](std::string entry) {
+        PyGILState_STATE state = PyGILState_Ensure(); // Acquires the GIL
+
+        PyObject *args = Py_BuildValue("(s)", entry.c_str());
+        if (args != nullptr) {
+            PyObject *result = PyObject_CallObject(callback, args);
+            if (result != nullptr) {
+                Py_DECREF(result);
+            } else {
+                PyErr_Print();
+            }
+            Py_DECREF(args);
+        } else {
+            PyErr_Print();
+        }
+
+        PyGILState_Release(state); // Releases the GIL
+    });
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 static PyObject *meth_set_input_filepath(PyObject *, PyObject *args) {
     const char *path = nullptr;
     long long pointer = 0LL;
@@ -212,6 +244,7 @@ static PyMethodDef Methods[] = {
     {"set_verbosity", meth_set_verbosity, METH_VARARGS, ""},
     {"increase_verbosity", meth_increase_verbosity, METH_VARARGS, ""},
     {"on_log", meth_on_log, METH_VARARGS, ""},
+    {"on_entry", meth_on_entry, METH_VARARGS, ""},
     {"set_input_filepath", meth_set_input_filepath, METH_VARARGS, ""},
     {"set_output_filepath", meth_set_output_filepath, METH_VARARGS, ""},
     {"set_options", meth_set_options, METH_VARARGS, ""},

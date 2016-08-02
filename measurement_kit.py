@@ -41,6 +41,10 @@ class _BaseTest(object):
         _mk.on_log(self._handle, callback)
         return self
 
+    def on_entry(self, callback):
+        _mk.on_entry(self._handle, callback)
+        return self
+
     def set_input_filepath(self, value):
         _mk.set_input_filepath(self._handle, value)
         return self
