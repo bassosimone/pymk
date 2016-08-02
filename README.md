@@ -15,8 +15,8 @@ Then,
 ```
 virtualenv venv
 source venv/bin/activate
-pip install twisted
+pip install -r requirements.txt
 python setup.py install
-python tests.py
+python tests/test_integration.py
 python examples/web_connectivity.py
 ```
