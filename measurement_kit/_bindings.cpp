@@ -96,7 +96,13 @@ static PyObject *meth_on_log(PyObject *, PyObject *args) {
     }
     MkCookie *cookie = (MkCookie *)pointer;
 
-    Py_INCREF(callback); /* XXX */
+    // Increment the reference counting of the callback used for logging to
+    // keep it safe and only release the reference when the logger dies
+    Py_INCREF(callback);
+    cookie->net_test->logger->on_eof([callback]() {
+        Py_DECREF(callback);
+    });
+
     cookie->net_test->on_log([callback](uint32_t severity, const char *line) {
         PyGILState_STATE state = PyGILState_Ensure(); // Acquires the GIL
 
