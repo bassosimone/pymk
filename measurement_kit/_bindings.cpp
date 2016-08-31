@@ -198,6 +198,18 @@ static PyObject *meth_set_output_filepath(PyObject *, PyObject *args) {
     return Py_None;
 }
 
+static PyObject *meth_set_error_filepath(PyObject *, PyObject *args) {
+    const char *path = nullptr;
+    long long pointer = 0LL;
+    if (!PyArg_ParseTuple(args, "Ls", &pointer, &path)) {
+        return nullptr;
+    }
+    MkCookie *cookie = (MkCookie *)pointer;
+    cookie->net_test->set_error_filepath(path);
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 static PyObject *meth_set_options(PyObject *, PyObject *args) {
     const char *key = nullptr;
     long long pointer = 0LL;
@@ -269,6 +281,7 @@ static PyMethodDef Methods[] = {
     {"on_entry", meth_on_entry, METH_VARARGS, ""},
     {"set_input_filepath", meth_set_input_filepath, METH_VARARGS, ""},
     {"set_output_filepath", meth_set_output_filepath, METH_VARARGS, ""},
+    {"set_error_filepath", meth_set_error_filepath, METH_VARARGS, ""},
     {"set_options", meth_set_options, METH_VARARGS, ""},
     {"run", meth_run, METH_VARARGS, ""},
     {"run_async", meth_run_async, METH_VARARGS, ""},
