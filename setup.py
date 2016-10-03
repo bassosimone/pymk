@@ -18,5 +18,14 @@ setup(name = 'measurement_kit',
 Portable C++11 network measurement library (Python bindings)
 ''',
       packages = ["measurement_kit"],
-      ext_modules = [extension],
-      )
+      ext_modules = [
+          extension,
+          Extension("measurement_kit.pybind",
+                    language="c++",
+                    extra_compile_args=["-std=c++11"],
+                    libraries=["measurement_kit"],
+                    sources=[
+                        "measurement_kit/pybind/module.cpp",
+                        "measurement_kit/pybind/compat-0.3.cpp"
+                    ])
+      ])

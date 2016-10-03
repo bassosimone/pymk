@@ -13,6 +13,7 @@ brew install --verbose --HEAD measurement-kit
 Then,
 
 ```
+brew install pybind11
 virtualenv venv
 source venv/bin/activate
 pip install -r requirements.txt
