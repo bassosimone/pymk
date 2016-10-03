@@ -2,12 +2,11 @@
 
 First you need to install MeasurementKit on your system. On a MacOS
 system you can use the [brew
-tap](https://github.com/bassosimone/homebrew-measurement-kit) to
-install the *development version* (currently 0.3.0-dev):
+tap](https://github.com/bassosimone/homebrew-measurement-kit):
 
 ```
 brew tap bassosimone/measurement-kit
-brew install --verbose --HEAD measurement-kit
+brew install --verbose measurement-kit
 ```
 
 Then,
