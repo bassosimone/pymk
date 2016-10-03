@@ -5,7 +5,7 @@ system you can use the [brew
 tap](https://github.com/bassosimone/homebrew-measurement-kit):
 
 ```
-brew tap bassosimone/measurement-kit
+brew tap measurement-kit/measurement-kit
 brew install --verbose measurement-kit
 ```
 
