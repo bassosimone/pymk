@@ -79,12 +79,14 @@ class _BaseTest(object):
 
     def run_deferred(self):
         """ Run the test and fire the deferred's callback when done """
-        from twisted.internet import defer
+        from twisted.internet import reactor, defer
         done = defer.Deferred()
 
         def callback():
             """ Function called when test is complete """
-            done.callback(None)
+            reactor.callInThread(
+                lambda: reactor.callFromThread(done.callback, None)
+            )
 
         _mk.run_async(self._handle, callback)
         return done

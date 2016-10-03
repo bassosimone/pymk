@@ -24,7 +24,7 @@ def main():
         .on_entry(print_entry)                                                 \
         .run_deferred()
 
-    done.addCallback(lambda *args: reactor.callFromThread(reactor.stop))
+    done.addCallback(lambda *_: reactor.stop())
     reactor.run()
 
 if __name__ == "__main__":
