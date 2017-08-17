@@ -1,6 +1,6 @@
 # Adapted from distutils documentation
 
-from distutils.core import setup, Extension
+from setuptools import setup, Extension
 
 extension = Extension('measurement_kit._bindings',
                       language = "c++",
