@@ -4,7 +4,7 @@ from setuptools import setup, Extension
 
 extension = Extension('measurement_kit._bindings',
                       language = "c++",
-                      extra_compile_args = ['-std=c++11'],
+                      extra_compile_args = ['-std=c++14'],
                       libraries = ['measurement_kit'],
                       sources = ['measurement_kit/_bindings.cpp'])
 
@@ -22,7 +22,7 @@ Portable C++11 network measurement library (Python bindings)
           extension,
           Extension("measurement_kit.pybind",
                     language="c++",
-                    extra_compile_args=["-std=c++11"],
+                    extra_compile_args=["-std=c++14"],
                     libraries=["measurement_kit"],
                     sources=[
                         "measurement_kit/pybind/module.cpp",
