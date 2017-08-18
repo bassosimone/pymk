@@ -7,11 +7,15 @@
 // Measurement-kit is free software. See AUTHORS and LICENSE for more
 // information on the copying conditions.
 
+#include <measurement_kit/nettests.hpp>
 #include <measurement_kit/ooni.hpp>
+#include <measurement_kit/report.hpp>
 
 namespace mk {
 namespace ooni {
 namespace scriptable {
+
+using namespace mk::report;
 
 // Convenience macro used to implement all callbacks below
 #define XX                                                                     \
@@ -86,7 +90,7 @@ void run(Callback<std::string> callback, Settings settings,
             return;
         }
         callback(entry->dump(4));
-    }, settings, logger, runner->reactor);
+    }, settings, runner->reactor, logger);
 }
 
 } // namespace scriptable
@@ -168,17 +172,18 @@ void RunnerNg::run_unlocked_(Callback<Continuation<>> kickoff) {
     });
 }
 
-void RunnerNg::run_test(Var<NetTest> test, Callback<Var<NetTest>> fn) {
+void RunnerNg::run_test(Var<nettests::BaseTest> test, Callback<Var<nettests::BaseTest>> fn) {
     run([=](Continuation<> complete) {
-        test->begin([=](Error) {
-            // TODO: do not ignore the error
-            test->end([=](Error) {
-                // TODO: do not ignore the error
-                complete([=]() {
-                    fn(test);
-                });
-            });
-        });
+        test->run();
+//        test->begin([=](Error) {
+//            // TODO: do not ignore the error
+//            test->end([=](Error) {
+//                // TODO: do not ignore the error
+//                complete([=]() {
+//                    fn(test);
+//                });
+//            });
+//        });
     });
 }
 

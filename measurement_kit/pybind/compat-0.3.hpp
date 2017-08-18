@@ -11,6 +11,7 @@
 //#define MEASUREMENT_KIT_COMMON_RUNNER_HPP
 
 #include <measurement_kit/common.hpp>
+#include <measurement_kit/nettests.hpp>
 
 #include <atomic>
 #include <string>
@@ -18,12 +19,12 @@
 
 namespace mk {
 
-class NetTest;
+//class nettests::BaseTest;
 
 class RunnerNg {
   public:
     RunnerNg();
-    void run_test(Var<NetTest> test, Callback<Var<NetTest>> func);
+    void run_test(Var<nettests::BaseTest> test, Callback<Var<nettests::BaseTest>> func);
     void run(Callback<Continuation<>> begin);
     void break_loop_();
     bool empty();
