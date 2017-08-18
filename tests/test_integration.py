@@ -78,28 +78,28 @@ def setup_web_connectivity():
         .set_options(b"nameserver", b"8.8.8.8:53")                             \
         .set_input_filepath(b"fixtures/urls.txt")
 
-class TestIntegrationSync(unittest.TestCase):
-    """ Integration test using sync wrappers """
-
-    def test_dns_injection(self):
-        """ Runs dns-injection test """
-        setup_dns_injection().run()
-
-    def test_http_invalid_request_line(self):
-        """ Runs http-invalid-request-line test """
-        setup_http_invalid_request_line().run()
-
-    def test_ndt(self):
-        """ Runs ndt test """
-        setup_ndt().run()
-
-    def test_tcp_connect(self):
-        """ Runs tcp-connect test """
-        setup_tcp_connect().run()
-
-    def test_web_connectivity(self):
-        """ Runs web-connectivity test """
-        setup_web_connectivity().run()
+# class TestIntegrationSync(unittest.TestCase):
+#     """ Integration test using sync wrappers """
+# 
+#     def test_dns_injection(self):
+#         """ Runs dns-injection test """
+#         setup_dns_injection().run()
+# 
+#     def test_http_invalid_request_line(self):
+#         """ Runs http-invalid-request-line test """
+#         setup_http_invalid_request_line().run()
+# 
+#     def test_ndt(self):
+#         """ Runs ndt test """
+#         setup_ndt().run()
+# 
+#     def test_tcp_connect(self):
+#         """ Runs tcp-connect test """
+#         setup_tcp_connect().run()
+# 
+#     def test_web_connectivity(self):
+#         """ Runs web-connectivity test """
+#         setup_web_connectivity().run()
 
 def async_run_of(creator):
     """ Executes asynchronous run of the creator function """
@@ -111,51 +111,51 @@ def async_run_of(creator):
     while not done[0]:
         time.sleep(1.0)
 
-class TestIntegrationAsync(unittest.TestCase):
-    """ Integration test using async wrappers """
-
-    def test_dns_injection(self):
-        """ Runs dns-injection test """
-        async_run_of(setup_dns_injection)
-
-    def test_http_invalid_request_line(self):
-        """ Runs http-invalid-request-line test """
-        async_run_of(setup_http_invalid_request_line)
-
-    def test_ndt(self):
-        """ Runs ndt test """
-        async_run_of(setup_ndt)
-
-    def test_tcp_connect(self):
-        """ Runs tcp-connect test """
-        async_run_of(setup_tcp_connect)
-
-    def test_web_connectivity(self):
-        """ Runs web-connectivity test """
-        async_run_of(setup_web_connectivity)
+# class TestIntegrationAsync(unittest.TestCase):
+#     """ Integration test using async wrappers """
+# 
+#     def test_dns_injection(self):
+#         """ Runs dns-injection test """
+#         async_run_of(setup_dns_injection)
+# 
+#     def test_http_invalid_request_line(self):
+#         """ Runs http-invalid-request-line test """
+#         async_run_of(setup_http_invalid_request_line)
+# 
+#     def test_ndt(self):
+#         """ Runs ndt test """
+#         async_run_of(setup_ndt)
+# 
+#     def test_tcp_connect(self):
+#         """ Runs tcp-connect test """
+#         async_run_of(setup_tcp_connect)
+# 
+#     def test_web_connectivity(self):
+#         """ Runs web-connectivity test """
+#         async_run_of(setup_web_connectivity)
 
 def deferred_run_of(creator):
     """ Executes deferred run of the creator function """
     return creator().run_deferred()
 
-class TestIntegrationDeferred(unittest.TestCase):
-    """ Integration test using deferred wrappers """
-
-    def test_all(self):
-        # XXX I'd like to run each test separately but I don't know how
-        # to do that avoiding the ReactorNotRestartable error
-        # pylint: disable=no-member
-        from twisted.internet import defer, reactor
-        results = defer.gatherResults([
-            deferred_run_of(setup_dns_injection),
-            deferred_run_of(setup_http_invalid_request_line),
-            deferred_run_of(setup_ndt),
-            deferred_run_of(setup_tcp_connect),
-            deferred_run_of(setup_web_connectivity),
-        ])
-        results.addCallback(lambda *_: reactor.stop())
-        reactor.run()
-        # pylint: enable=no-member
+# class TestIntegrationDeferred(unittest.TestCase):
+#     """ Integration test using deferred wrappers """
+# 
+#     def test_all(self):
+#         # XXX I'd like to run each test separately but I don't know how
+#         # to do that avoiding the ReactorNotRestartable error
+#         # pylint: disable=no-member
+#         from twisted.internet import defer, reactor
+#         results = defer.gatherResults([
+#             deferred_run_of(setup_dns_injection),
+#             deferred_run_of(setup_http_invalid_request_line),
+#             deferred_run_of(setup_ndt),
+#             deferred_run_of(setup_tcp_connect),
+#             deferred_run_of(setup_web_connectivity),
+#         ])
+#         results.addCallback(lambda *_: reactor.stop())
+#         reactor.run()
+#         # pylint: enable=no-member
 
 if __name__ == "__main__":
     unittest.main()
