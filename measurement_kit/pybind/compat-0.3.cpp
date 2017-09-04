@@ -62,6 +62,15 @@ void web_connectivity(std::string input, Settings settings,
     });
 }
 
+void meek_fronted_requests(std::string input, Settings settings,
+                      Callback<std::string> callback,
+                      Var<RunnerNg> runner,
+                      Var<Logger> logger) {
+    runner->run([=](Continuation<> complete) {
+        ooni::meek_fronted_requests(input, settings, XX, runner->reactor, logger);
+    });
+}
+
 } // namespace scriptable
 } // namespace mk
 } // namespace ooni

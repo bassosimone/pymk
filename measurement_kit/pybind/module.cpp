@@ -30,5 +30,17 @@ PYBIND11_PLUGIN(pybind) {
                   });
           });
 
+    m.def("meek_fronted_requests",
+          [](std::string input, std::map<std::string, std::string> settings,
+             py::function callback) {
+              py::gil_scoped_release release;
+              mk::Settings cxx_settings(settings.begin(), settings.end());
+              mk::ooni::scriptable::meek_fronted_requests(
+                  input, cxx_settings, [=](std::string s) {
+                      py::gil_scoped_acquire acquire;
+                      callback(s);
+                  });
+          });
+
     return m.ptr();
 }

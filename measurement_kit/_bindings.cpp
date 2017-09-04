@@ -47,6 +47,8 @@ static PyObject *meth_create(PyObject *, PyObject *args) {
         cookie->net_test.reset(new nettests::DnsInjectionTest);
     } else if (strcmp(name, "http_invalid_request_line") == 0) {
         cookie->net_test.reset(new nettests::HttpInvalidRequestLineTest);
+    } else if (strcmp(name, "meek_fronted_requests") == 0) {
+        cookie->net_test.reset(new nettests::MeekFrontedRequestsTest);
     } else if (strcmp(name, "tcp_connect") == 0) {
         cookie->net_test.reset(new nettests::TcpConnectTest);
     } else if (strcmp(name, "web_connectivity") == 0) {
