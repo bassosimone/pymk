@@ -36,7 +36,11 @@ def dns_query(url):
     done = tx.dns_query(url)
     def print_entry(entry):
         pprint(entry)
+    def errback(error):
+        print("ERROR")
+        print(error)
     done.addCallback(print_entry)
+    done.addErrback(errback)
     return done
 
 def initialize():
@@ -50,13 +54,16 @@ def initialize():
     #    meek_fronted_requests("a0.awsstatic.com:d2zfqthxsdq309.cloudfront.net")
     #])
     done = defer.gatherResults([
-        dns_query("google.com"),
-        meek_fronted_requests("a0.awsstatic.com:d2zfqthxsdq309.cloudfront.net")
+        dns_query("google.com")
     ])
     done.addBoth(lambda *_: reactor.stop())
 
 def main():
     """ Main function """
+    tx.increase_verbosity()
+    tx.increase_verbosity()
+    tx.increase_verbosity()
+    tx.increase_verbosity()
     reactor.callWhenRunning(initialize)
     reactor.run()
 

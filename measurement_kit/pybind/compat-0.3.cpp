@@ -83,17 +83,18 @@ void meek_fronted_requests(std::string input, Settings settings,
 void dns_query(std::string input, Callback<std::string> callback,
                Var<RunnerNg> runner, Var<Logger> logger) {
     Var<Entry> entry(new Entry);
+    Settings settings;
     runner->run([=](Continuation<> complete) {
-        ooni::templates::dns_query(entry, "A", "IN", input, "8.8.8.8",
+        ooni::templates::dns_query(entry, "A", "IN", "google.com", "8.8.8.8",
             [=](Error err, Var<dns::Message> message) {
                 complete([=]() {
                     if (!!err) {
                         callback("{}");
                         return;
                     }
-                    callback("{'dummy':'joe'}");
+                    callback("{\"dummy\":\"joe\"}");
                 });
-        });
+        }, settings, runner->reactor, logger);
     });
 }
 

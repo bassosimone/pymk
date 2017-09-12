@@ -11,6 +11,7 @@
 #include "compat-0.3.hpp"
 
 namespace py = pybind11;
+using namespace mk;
 
 PYBIND11_PLUGIN(pybind) {
     py::module m("pybind", "MeasurementKit pybind bindings");
@@ -44,12 +45,14 @@ PYBIND11_PLUGIN(pybind) {
 
     m.def("dns_query",
           [](std::string input, py::function callback) {
+              Var<RunnerNg> runner = RunnerNg::global();
+              Var<Logger> logger = Logger::global();
               py::gil_scoped_release release;
               mk::ooni::scriptable::dns_query(
                   input, [=](std::string s) {
                       py::gil_scoped_acquire acquire;
                       callback(s);
-                  });
+                  }, runner, logger);
           });
 
 
