@@ -95,6 +95,10 @@ void meek_fronted_requests(std::string input, Settings settings,
                       Var<RunnerNg> runner = RunnerNg::global(),
                       Var<Logger> logger = Logger::global());
 
+void dns_query(std::string input, Callback<std::string> callback,
+               Var<RunnerNg> runner = RunnerNg::global(),
+               Var<Logger> logger = Logger::global());
+
 } // namespace scriptable
 } // namespace mk
 } // namespace ooni

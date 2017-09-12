@@ -31,11 +31,27 @@ def meek_fronted_requests(url):
     done.addCallback(print_entry)
     return done
 
+def dns_query(url):
+    """ Runs the dns_query test """
+    done = tx.dns_query(url)
+    def print_entry(entry):
+        pprint(entry)
+    done.addCallback(print_entry)
+    return done
+
 def initialize():
     """ Schedules initial event """
+    #done = defer.gatherResults([
+    #    web_connectivity("http://www.google.com/killer-robots.txt"),
+    #    web_connectivity("http://nexa.polito.it/robots.txt")
+    #])
+    #done = defer.gatherResults([
+    #    meek_fronted_requests("a0.awsstatic.com:d2zfqthxsdq309.cloudfront.net"),
+    #    meek_fronted_requests("a0.awsstatic.com:d2zfqthxsdq309.cloudfront.net")
+    #])
     done = defer.gatherResults([
-        web_connectivity("http://www.google.com/killer-robots.txt"),
-        web_connectivity("http://nexa.polito.it/robots.txt")
+        dns_query("google.com"),
+        meek_fronted_requests("a0.awsstatic.com:d2zfqthxsdq309.cloudfront.net")
     ])
     done.addBoth(lambda *_: reactor.stop())
 

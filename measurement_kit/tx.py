@@ -46,3 +46,15 @@ def meek_fronted_requests(input_, settings):
     done.addCallback(do_load)
     return done
 
+def dns_query(input_):
+    """ Run OONI DNSQuery template """
+    done = defer.Deferred()
+    def callback(entry):
+        reactor.callInThread(
+            lambda: reactor.callFromThread(done.callback, entry)
+        )
+    pybind.dns_query(input_, callback)
+    def do_load(entry):
+        return json.loads(entry)
+    done.addCallback(do_load)
+    return done

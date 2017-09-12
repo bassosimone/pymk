@@ -42,5 +42,16 @@ PYBIND11_PLUGIN(pybind) {
                   });
           });
 
+    m.def("dns_query",
+          [](std::string input, py::function callback) {
+              py::gil_scoped_release release;
+              mk::ooni::scriptable::dns_query(
+                  input, [=](std::string s) {
+                      py::gil_scoped_acquire acquire;
+                      callback(s);
+                  });
+          });
+
+
     return m.ptr();
 }
