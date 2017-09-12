@@ -32,3 +32,17 @@ def web_connectivity(input_, settings):
         return json.loads(entry)
     done.addCallback(do_load)
     return done
+
+def meek_fronted_requests(input_, settings):
+    """ Run OONI MeekFrontedRequests test """
+    done = defer.Deferred()
+    def callback(entry):
+        reactor.callInThread(
+            lambda: reactor.callFromThread(done.callback, entry)
+        )
+    pybind.meek_fronted_requests(input_, settings, callback)
+    def do_load(entry):
+        return json.loads(entry)
+    done.addCallback(do_load)
+    return done
+

@@ -21,6 +21,16 @@ def web_connectivity(url):
     done.addCallback(print_entry)
     return done
 
+def meek_fronted_requests(url):
+    """ Runs the meek-fronted-requests test """
+    done = tx.meek_fronted_requests(url, {
+        "no_collector": "1",
+    })
+    def print_entry(entry):
+        pprint(entry)
+    done.addCallback(print_entry)
+    return done
+
 def initialize():
     """ Schedules initial event """
     done = defer.gatherResults([
