@@ -99,6 +99,14 @@ void dns_query(std::string input, Callback<std::string> callback,
                Var<RunnerNg> runner = RunnerNg::global(),
                Var<Logger> logger = Logger::global());
 
+void http_request(std::string input, Callback<std::string> callback,
+               Var<RunnerNg> runner = RunnerNg::global(),
+               Var<Logger> logger = Logger::global());
+
+void tcp_connect(std::string input, Callback<std::string> callback,
+               Var<RunnerNg> runner = RunnerNg::global(),
+               Var<Logger> logger = Logger::global());
+
 } // namespace scriptable
 } // namespace mk
 } // namespace ooni

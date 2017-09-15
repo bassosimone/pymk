@@ -43,6 +43,18 @@ def dns_query(url):
     done.addErrback(errback)
     return done
 
+def http_request(url):
+    """ Runs the http_request test """
+    done = tx.http_request(url)
+    def print_entry(entry):
+        pprint(entry)
+    def errback(error):
+        print("ERROR")
+        print(error)
+    done.addCallback(print_entry)
+    done.addErrback(errback)
+    return done
+
 def initialize():
     """ Schedules initial event """
     #done = defer.gatherResults([
@@ -54,12 +66,13 @@ def initialize():
     #    meek_fronted_requests("a0.awsstatic.com:d2zfqthxsdq309.cloudfront.net")
     #])
     done = defer.gatherResults([
-        dns_query("google.com")
+        http_request("http://google.com")
     ])
     done.addBoth(lambda *_: reactor.stop())
 
 def main():
     """ Main function """
+    tx.increase_verbosity()
     tx.increase_verbosity()
     tx.increase_verbosity()
     tx.increase_verbosity()

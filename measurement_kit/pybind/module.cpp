@@ -55,6 +55,18 @@ PYBIND11_PLUGIN(pybind) {
                   }, runner, logger);
           });
 
+    m.def("http_request",
+          [](std::string input, py::function callback) {
+              Var<RunnerNg> runner = RunnerNg::global();
+              Var<Logger> logger = Logger::global();
+              py::gil_scoped_release release;
+              mk::ooni::scriptable::http_request(
+                  input, [=](std::string s) {
+                      py::gil_scoped_acquire acquire;
+                      callback(s);
+                  }, runner, logger);
+          });
+
 
     return m.ptr();
 }

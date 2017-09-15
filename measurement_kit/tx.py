@@ -58,3 +58,16 @@ def dns_query(input_):
         return json.loads(entry)
     done.addCallback(do_load)
     return done
+
+def http_request(input_):
+    """ Run OONI HTTPRequest template """
+    done = defer.Deferred()
+    def callback(entry):
+        reactor.callInThread(
+            lambda: reactor.callFromThread(done.callback, entry)
+        )
+    pybind.http_request(input_, callback)
+    def do_load(entry):
+        return json.loads(entry)
+    done.addCallback(do_load)
+    return done

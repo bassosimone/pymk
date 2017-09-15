@@ -67,16 +67,7 @@ void meek_fronted_requests(std::string input, Settings settings,
                       Var<RunnerNg> runner,
                       Var<Logger> logger) {
     runner->run([=](Continuation<> complete) {
-        ooni::meek_fronted_requests(input, settings,
-            [=](Var<Entry> entry) {
-                complete([=]() {
-                    if (!entry) {
-                        callback("{}");
-                        return;
-                    }
-                    callback(entry->dump(4));
-                });
-        }, runner->reactor, logger);
+        ooni::meek_fronted_requests(input, settings, XX, runner->reactor, logger);
     });
 }
 
@@ -92,9 +83,30 @@ void dns_query(std::string input, Callback<std::string> callback,
                         callback("{}");
                         return;
                     }
-                    callback("{\"dummy\":\"joe\"}");
+                    callback(entry->dump(4));
                 });
         }, settings, runner->reactor, logger);
+    });
+}
+
+void http_request(std::string input, Callback<std::string> callback,
+                  Var<RunnerNg> runner, Var<Logger> logger) {
+    Var<Entry> entry(new Entry);
+    Settings settings;
+    settings["http/url"] = input;
+    http::Headers headers;
+    std::string body = "";
+    runner->run([=](Continuation<> complete) {
+        ooni::templates::http_request(entry, settings, headers, body,
+            [=](Error err, Var<http::Response> response){
+                complete([=]() {
+                    if (!!err) {
+                        callback("{}");
+                        return;
+                    }
+                    callback(entry->dump(4));
+                });
+        }, runner->reactor, logger);
     });
 }
 
