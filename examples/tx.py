@@ -55,6 +55,18 @@ def http_request(url):
     done.addErrback(errback)
     return done
 
+def tcp_connect2(host_port, payload):
+    """ Runs the tcp_connect test """
+    done = tx.tcp_connect2(host_port, payload)
+    def print_entry(entry):
+        pprint(entry)
+    def errback(error):
+        print("ERROR")
+        print(error)
+    done.addCallback(print_entry)
+    done.addErrback(errback)
+    return done
+
 def initialize():
     """ Schedules initial event """
     #done = defer.gatherResults([
@@ -66,7 +78,7 @@ def initialize():
     #    meek_fronted_requests("a0.awsstatic.com:d2zfqthxsdq309.cloudfront.net")
     #])
     done = defer.gatherResults([
-        http_request("http://google.com")
+        tcp_connect2("127.0.0.1:2000", "howdy")
     ])
     done.addBoth(lambda *_: reactor.stop())
 

@@ -67,6 +67,19 @@ PYBIND11_PLUGIN(pybind) {
                   }, runner, logger);
           });
 
+    m.def("tcp_connect2",
+          [](std::string host_port, std::string payload,
+	     py::function callback) {
+              Var<RunnerNg> runner = RunnerNg::global();
+              Var<Logger> logger = Logger::global();
+              py::gil_scoped_release release;
+              mk::ooni::scriptable::tcp_connect2(
+                  host_port, payload, [=](std::string s) {
+                      py::gil_scoped_acquire acquire;
+                      callback(s);
+                  }, runner, logger);
+          });
+
 
     return m.ptr();
 }

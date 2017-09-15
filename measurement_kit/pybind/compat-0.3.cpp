@@ -110,6 +110,52 @@ void http_request(std::string input, Callback<std::string> callback,
     });
 }
 
+// similar to above tcp_connect(), but this one lets you send
+// a payload and receive a response
+void tcp_connect2(std::string host_port, std::string payload,
+		  Callback<std::string> callback,
+		  Var<RunnerNg> runner, Var<Logger> logger) {
+    Var<Entry> entry(new Entry);
+    Settings options;
+    (*entry)["connection"] = nullptr;
+
+    ErrorOr<net::Endpoint> maybe_epnt = net::parse_endpoint(host_port, 80);
+    if (!maybe_epnt) {
+        (*entry)["connection"] = maybe_epnt.as_error().reason;
+        callback(entry->dump(4));
+        return;
+    }
+    options["host"] = maybe_epnt->hostname;
+    options["port"] = maybe_epnt->port;
+    logger->debug("tcp_connect2: parsed host:%s, port:%s", options["host"].c_str(),
+		options["port"].c_str());
+    templates::tcp_connect(options, [=](Error err, Var<net::Transport> txp) {
+        logger->debug("tcp_connect2: connected to endpoint");
+        if (!!err) {
+            (*entry)["connection"] = err.reason;
+            callback(entry->dump(4));
+            return;
+        }
+        Var<std::string> received_data(new std::string);
+        txp->on_data([=](net::Buffer data) {
+            logger->debug("tcp_connect2: on_data: %s",
+                          data.peek().c_str());
+            *received_data += data.read();
+        });
+        txp->write(payload);
+
+        // We assume to have received all the data after a timeout
+        // of 5 seconds. XXX hardcoded
+        runner->reactor->call_later(5, [=]() {
+            (*entry)["connection"] = "success";
+            (*entry)["sent"] = payload;
+            (*entry)["received"] = *received_data;
+            txp->close([=]() { callback(entry->dump(4)); });
+	});
+    }, runner->reactor, logger);
+
+}
+
 } // namespace scriptable
 } // namespace mk
 } // namespace ooni

@@ -71,3 +71,16 @@ def http_request(input_):
         return json.loads(entry)
     done.addCallback(do_load)
     return done
+
+def tcp_connect2(host_port_, payload_):
+    """ Run OONI tcp_connect2 template """
+    done = defer.Deferred()
+    def callback(entry):
+        reactor.callInThread(
+            lambda: reactor.callFromThread(done.callback, entry)
+        )
+    pybind.tcp_connect2(host_port_, payload_, callback)
+    def do_load(entry):
+        return json.loads(entry)
+    done.addCallback(do_load)
+    return done

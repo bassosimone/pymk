@@ -103,7 +103,8 @@ void http_request(std::string input, Callback<std::string> callback,
                Var<RunnerNg> runner = RunnerNg::global(),
                Var<Logger> logger = Logger::global());
 
-void tcp_connect(std::string input, Callback<std::string> callback,
+void tcp_connect2(std::string host_port, std::string payload,
+	       Callback<std::string> callback,
                Var<RunnerNg> runner = RunnerNg::global(),
                Var<Logger> logger = Logger::global());
 
