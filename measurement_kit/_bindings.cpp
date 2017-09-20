@@ -7,6 +7,7 @@
 #include <Python.h> // Should be first header
 
 #include <measurement_kit/ndt.hpp>
+#include <measurement_kit/nettests.hpp>
 #include <measurement_kit/ooni.hpp>
 
 extern "C" {
@@ -17,18 +18,20 @@ using namespace mk;
 // code below SHOULD NOT assume that cookie is alive after the test has been
 // started, i.e. no callback should ever refer to it.
 struct MkCookie {
-    Var<NetTest> net_test;
+    Var<nettests::BaseTest> net_test;
 };
 
 static PyObject *meth_library_version(PyObject *, PyObject *args) {
     if (!PyArg_ParseTuple(args, "")) {
         return nullptr;
     }
-    std::string version = library_version();
-    if (version != MEASUREMENT_KIT_VERSION) {
-        PyErr_SetString(PyExc_RuntimeError, "MK version mismatch");
-        return nullptr;
-    }
+    // XXX
+    //std::string version = library_version();
+    std::string version = "dummy_version";
+//    if (version != MEASUREMENT_KIT_VERSION) {
+//        PyErr_SetString(PyExc_RuntimeError, "MK version mismatch");
+//        return nullptr;
+//    }
     return Py_BuildValue("s", version.c_str());
 }
 
@@ -39,15 +42,17 @@ static PyObject *meth_create(PyObject *, PyObject *args) {
     }
     MkCookie *cookie = new MkCookie;
     if (strcmp(name, "ndt") == 0) {
-        cookie->net_test.reset(new ndt::NdtTest);
+        cookie->net_test.reset(new nettests::NdtTest);
     } else if (strcmp(name, "dns_injection") == 0) {
-        cookie->net_test.reset(new ooni::DnsInjection);
+        cookie->net_test.reset(new nettests::DnsInjectionTest);
     } else if (strcmp(name, "http_invalid_request_line") == 0) {
-        cookie->net_test.reset(new ooni::HttpInvalidRequestLine);
+        cookie->net_test.reset(new nettests::HttpInvalidRequestLineTest);
+    } else if (strcmp(name, "meek_fronted_requests") == 0) {
+        cookie->net_test.reset(new nettests::MeekFrontedRequestsTest);
     } else if (strcmp(name, "tcp_connect") == 0) {
-        cookie->net_test.reset(new ooni::TcpConnect);
+        cookie->net_test.reset(new nettests::TcpConnectTest);
     } else if (strcmp(name, "web_connectivity") == 0) {
-        cookie->net_test.reset(new ooni::WebConnectivity);
+        cookie->net_test.reset(new nettests::WebConnectivityTest);
     } else {
         /* nothing */ ;
     }
@@ -104,7 +109,7 @@ static PyObject *meth_on_log(PyObject *, PyObject *args) {
     // Increment the reference counting of the callback used for logging to
     // keep it safe and only release the reference when the logger dies
     Py_INCREF(callback);
-    cookie->net_test->logger->on_eof([callback]() {
+    cookie->net_test->on_logger_eof([callback]() {
         // Note: this is called by the destructor of the logger when the
         // owning NetTest is also about to be destroyed
         Py_DECREF(callback);
@@ -145,7 +150,7 @@ static PyObject *meth_on_entry(PyObject *, PyObject *args) {
     // we enter into the `end` state. It should not happen that `on_entry` is
     // called again, but for robustness, better to clear it.
     Py_INCREF(callback);
-    Var<NetTest> net_test = cookie->net_test;
+    Var<nettests::BaseTest> net_test = cookie->net_test;
     cookie->net_test->on_end([callback, net_test]() {
         net_test->on_entry(nullptr);
         Py_DECREF(callback);
@@ -252,7 +257,8 @@ static PyObject *meth_run_async(PyObject *, PyObject *args) {
     Py_INCREF(callback);
     Py_BEGIN_ALLOW_THREADS // Releases the GIL
 
-    cookie->net_test->run([callback]() {
+    //cookie->net_test->run();
+    cookie->net_test->start([callback]() {
         PyGILState_STATE state = PyGILState_Ensure(); // Acquires the GIL
 
         PyObject *result = PyObject_CallObject(callback, nullptr);

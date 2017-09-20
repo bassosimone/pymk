@@ -11,6 +11,7 @@
 //#define MEASUREMENT_KIT_COMMON_RUNNER_HPP
 
 #include <measurement_kit/common.hpp>
+#include <measurement_kit/nettests.hpp>
 
 #include <atomic>
 #include <string>
@@ -18,12 +19,12 @@
 
 namespace mk {
 
-class NetTest;
+//class nettests::BaseTest;
 
 class RunnerNg {
   public:
     RunnerNg();
-    void run_test(Var<NetTest> test, Callback<Var<NetTest>> func);
+    void run_test(Var<nettests::BaseTest> test, Callback<Var<nettests::BaseTest>> func);
     void run(Callback<Continuation<>> begin);
     void break_loop_();
     bool empty();
@@ -88,6 +89,24 @@ void web_connectivity(std::string input, Settings settings,
                       Callback<std::string> callback,
                       Var<RunnerNg> runner = RunnerNg::global(),
                       Var<Logger> logger = Logger::global());
+
+void meek_fronted_requests(std::string input, Settings settings,
+                      Callback<std::string> callback,
+                      Var<RunnerNg> runner = RunnerNg::global(),
+                      Var<Logger> logger = Logger::global());
+
+void dns_query(std::string input, Callback<std::string> callback,
+               Var<RunnerNg> runner = RunnerNg::global(),
+               Var<Logger> logger = Logger::global());
+
+void http_request(std::string input, Callback<std::string> callback,
+               Var<RunnerNg> runner = RunnerNg::global(),
+               Var<Logger> logger = Logger::global());
+
+void tcp_connect2(std::string host_port, std::string payload,
+	       Callback<std::string> callback,
+               Var<RunnerNg> runner = RunnerNg::global(),
+               Var<Logger> logger = Logger::global());
 
 } // namespace scriptable
 } // namespace mk

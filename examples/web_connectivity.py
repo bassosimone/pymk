@@ -18,9 +18,10 @@ def main():
         print(entry)
 
     done = measurement_kit.WebConnectivity()                                   \
-        .set_verbosity(measurement_kit.MK_LOG_INFO)                            \
-        .set_options(b"nameserver", b"8.8.8.8:53")                             \
-        .set_input_filepath(b"fixtures/urls.txt")                              \
+        .set_verbosity(measurement_kit.MK_LOG_DEBUG)                            \
+        .set_options("nameserver", "8.8.8.8:53")                             \
+        .set_options("no_collector", "1")                             \
+        .set_input_filepath("fixtures/urls.txt")                              \
         .on_entry(print_entry)                                                 \
         .run_deferred()
 

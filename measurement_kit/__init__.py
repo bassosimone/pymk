@@ -125,3 +125,9 @@ class WebConnectivity(_BaseTest):
 
     def __init__(self):
         super(self.__class__, self).__init__(b"web_connectivity")
+
+class MeekFrontedRequests(_BaseTest):
+    """ OONI's meek-fronted-requests test """
+
+    def __init__(self):
+        super(self.__class__, self).__init__(b"meek_fronted_requests")

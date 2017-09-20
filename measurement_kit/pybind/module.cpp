@@ -11,6 +11,7 @@
 #include "compat-0.3.hpp"
 
 namespace py = pybind11;
+using namespace mk;
 
 PYBIND11_PLUGIN(pybind) {
     py::module m("pybind", "MeasurementKit pybind bindings");
@@ -29,6 +30,56 @@ PYBIND11_PLUGIN(pybind) {
                       callback(s);
                   });
           });
+
+    m.def("meek_fronted_requests",
+          [](std::string input, std::map<std::string, std::string> settings,
+             py::function callback) {
+              py::gil_scoped_release release;
+              mk::Settings cxx_settings(settings.begin(), settings.end());
+              mk::ooni::scriptable::meek_fronted_requests(
+                  input, cxx_settings, [=](std::string s) {
+                      py::gil_scoped_acquire acquire;
+                      callback(s);
+                  });
+          });
+
+    m.def("dns_query",
+          [](std::string input, py::function callback) {
+              Var<RunnerNg> runner = RunnerNg::global();
+              Var<Logger> logger = Logger::global();
+              py::gil_scoped_release release;
+              mk::ooni::scriptable::dns_query(
+                  input, [=](std::string s) {
+                      py::gil_scoped_acquire acquire;
+                      callback(s);
+                  }, runner, logger);
+          });
+
+    m.def("http_request",
+          [](std::string input, py::function callback) {
+              Var<RunnerNg> runner = RunnerNg::global();
+              Var<Logger> logger = Logger::global();
+              py::gil_scoped_release release;
+              mk::ooni::scriptable::http_request(
+                  input, [=](std::string s) {
+                      py::gil_scoped_acquire acquire;
+                      callback(s);
+                  }, runner, logger);
+          });
+
+    m.def("tcp_connect2",
+          [](std::string host_port, std::string payload,
+	     py::function callback) {
+              Var<RunnerNg> runner = RunnerNg::global();
+              Var<Logger> logger = Logger::global();
+              py::gil_scoped_release release;
+              mk::ooni::scriptable::tcp_connect2(
+                  host_port, payload, [=](std::string s) {
+                      py::gil_scoped_acquire acquire;
+                      callback(s);
+                  }, runner, logger);
+          });
+
 
     return m.ptr();
 }

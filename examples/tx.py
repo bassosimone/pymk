@@ -21,16 +21,74 @@ def web_connectivity(url):
     done.addCallback(print_entry)
     return done
 
+def meek_fronted_requests(url):
+    """ Runs the meek-fronted-requests test """
+    done = tx.meek_fronted_requests(url, {
+        "no_collector": "1",
+    })
+    def print_entry(entry):
+        pprint(entry)
+    done.addCallback(print_entry)
+    return done
+
+def dns_query(url):
+    """ Runs the dns_query test """
+    done = tx.dns_query(url)
+    def print_entry(entry):
+        pprint(entry)
+    def errback(error):
+        print("ERROR")
+        print(error)
+    done.addCallback(print_entry)
+    done.addErrback(errback)
+    return done
+
+def http_request(url):
+    """ Runs the http_request test """
+    done = tx.http_request(url)
+    def print_entry(entry):
+        pprint(entry)
+    def errback(error):
+        print("ERROR")
+        print(error)
+    done.addCallback(print_entry)
+    done.addErrback(errback)
+    return done
+
+def tcp_connect2(host_port, payload):
+    """ Runs the tcp_connect test """
+    done = tx.tcp_connect2(host_port, payload)
+    def print_entry(entry):
+        pprint(entry)
+    def errback(error):
+        print("ERROR")
+        print(error)
+    done.addCallback(print_entry)
+    done.addErrback(errback)
+    return done
+
 def initialize():
     """ Schedules initial event """
+    #done = defer.gatherResults([
+    #    web_connectivity("http://www.google.com/killer-robots.txt"),
+    #    web_connectivity("http://nexa.polito.it/robots.txt")
+    #])
+    #done = defer.gatherResults([
+    #    meek_fronted_requests("a0.awsstatic.com:d2zfqthxsdq309.cloudfront.net"),
+    #    meek_fronted_requests("a0.awsstatic.com:d2zfqthxsdq309.cloudfront.net")
+    #])
     done = defer.gatherResults([
-        web_connectivity("http://www.google.com/killer-robots.txt"),
-        web_connectivity("http://nexa.polito.it/robots.txt")
+        tcp_connect2("127.0.0.1:2000", "howdy")
     ])
     done.addBoth(lambda *_: reactor.stop())
 
 def main():
     """ Main function """
+    tx.increase_verbosity()
+    tx.increase_verbosity()
+    tx.increase_verbosity()
+    tx.increase_verbosity()
+    tx.increase_verbosity()
     reactor.callWhenRunning(initialize)
     reactor.run()
 
